@@ -1,20 +1,29 @@
 import Chart from 'chart.js/auto'
-import LineChart from '../dist/chart/LineChart';
+import LineChartHelper from '../dist/chart/LineChartHelper';
 
 export default class Bootstrap {
 
     constructor() {
         this.prepareChart();
+
+        this.buttons();
     }
 
 
     prepareChart() {
         const ctx = document.getElementById('chart').getContext('2d');
-        const myChart = new Chart(ctx, {
-            type: LineChart.type,
-            data: LineChart.data,
-            options: LineChart.options
+        this.myLineChart = new Chart(ctx, {
+            type: LineChartHelper.type,
+            data: LineChartHelper.data,
+            options: LineChartHelper.options
         });
+        
+    }
+
+    buttons() {
+        document.getElementById('add').addEventListener('click', (ev) => {
+            LineChartHelper.addDataPoint(this.myLineChart, '', document.getElementById('day').value, document.getElementById('incidence').value)
+        })
     }
 
 }
