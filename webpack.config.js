@@ -8,8 +8,8 @@ module.exports = {
         devMiddleware: {
             index: true,
             mimeTypes: { phtml: 'text/html' },
-            publicPath: '/publicPathForDevServe',
-            serverSideRender: true,
+            publicPath: '/dist',
+            serverSideRender: false,
             writeToDisk: true,
         },
     },

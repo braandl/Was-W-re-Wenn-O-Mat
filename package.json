@@ -7,6 +7,7 @@
     "test": "test",
     "watch": "webpack --watch",
     "dev": "webpack serve --open --mode=development",
+    "dist": "webpack --mode=production",
     "build": "webpack"
   },
   "repository": {
@@ -33,6 +34,7 @@
   },
   "dependencies": {
     "chart.js": "^3.6.2",
+    "chartjs-plugin-dragdata": "^2.2.2",
     "jQuery": "^1.7.4"
   }
 }
