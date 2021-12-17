@@ -1,3 +1,5 @@
+import Statistics from "./stats/Statistics";
+
 export default class DataAdapter {
 
     async load(resolve, reject) {
@@ -17,12 +19,27 @@ export default class DataAdapter {
     }
 
     getCases(json) {
-        const res = json.features.map(({ attributes }) => attributes.AnzFallVortag);
-      
         const sevenDays = [];
-        for (let i = 7; i < res.length + 7; i++) {
-            sevenDays.push( Math.abs(res[ i ] -  res[ i - 6 ]) / 80 );
+        for (let i = 0; i < 7; i++) {
+            sevenDays.push(0);
         }
+        const res = json.features.map(({ attributes }) => attributes.AnzFallErkrankung + attributes.AnzFallMeldung);
+      
+        for (let i = 6; i < res.length; i++) {
+            let avg = res[ i - 6 ] 
+                    + res[ i - 5 ]
+                    + res[ i - 4 ]
+                    + res[ i - 3 ]
+                    + res[ i - 2 ]
+                    + res[ i - 1 ]
+                    + res[ i ];
+            
+            avg /= Statistics.realResidents
+            avg *= 100000
+
+            sevenDays.push(avg);
+        }
+
         
         return sevenDays 
     }

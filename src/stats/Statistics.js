@@ -6,11 +6,16 @@ export default class Statistics {
 
         let p = 0;
 
+        /*
         for (let i = 0; i < day; i++) {
-            p += ((day * Statistics.residents) / Statistics.realResidents) / 7
+            p += ((cases[i] / 7) / Statistics.realResidents) 
         }
+        */
 
-        return p;
+        for (let i = 0; i < day; i++) {
+            p += (cases[i] / Statistics.realResidents) 
+        }
+        return p * 100;
     }
 
     plausabilityOfInfectionVaxinated(cases, day) {
