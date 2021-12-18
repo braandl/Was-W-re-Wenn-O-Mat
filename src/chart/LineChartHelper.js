@@ -1,12 +1,13 @@
 
 import Chart from 'chartjs-plugin-dragdata'
+import Spread from './Spread';
 
 export default class LineChartHelper {
 
     static get type() {
         return 'line'
     }
-
+    
     static labels(cnt) {
         const labels = [];
         for (let i = 1; i <= cnt; ++i) {
@@ -31,14 +32,15 @@ export default class LineChartHelper {
                     fill: true,
                     tension: .4,
                     borderWidth: 1,
-                    pointHitRadius: 25
+                    pointHitRadius: 25,
+                    label: '7-Tage Inzidenz pro 100k Einwohner',
                 }
             ]
         };
     }
 
     static get options() {
-        return {
+        const options = {
             responsive: false,
             plugins: LineChartHelper.plugins(),
             interaction: {
@@ -58,17 +60,43 @@ export default class LineChartHelper {
                         display: true,
                         text: 'Inzidenz'
                     },
-                    max: 600,
+                    max: 2000,
                     min: 0,
                     suggestedMin: 0,
                     suggestedMax: 600
                 }
             }
         }
+        console.log(options)
+        return options;
     }
 
     static plugins() {
-        return Object.assign({}, LineChartHelper.dragPlugin(), LineChartHelper.titlePlugin())
+        return Object.assign({}, LineChartHelper.dragPlugin(), LineChartHelper.titlePlugin(), LineChartHelper.zoomPlugin())
+    }
+
+    static zoomPlugin() {
+        return {
+            zoom: {
+                zoom: {
+                    wheel: {
+                        enabled: true,
+                    },
+                    pinch: {
+                        enabled: true
+                    },
+                    mode: 'x',
+                },
+                drag: {
+                    enabled: true,
+                    mode: 'x'
+                },
+                pan: {
+                    enabled: true,
+                    mode: 'x'
+                },
+            }
+        }
     }
 
     static titlePlugin() {
@@ -87,24 +115,15 @@ export default class LineChartHelper {
                 round: 0, // rounds the values to n decimal places 
                 // in this case 1, e.g 0.1234 => 0.1)
                 showTooltip: true, // show the tooltip while dragging [default = true]
-                // onDragStart: (e, element) => {
-                //     startingValue = LineChartHelper.Chart.data.datasets[element].data[element._index]
-                // },
-                // onDrag: (e, datasetIndex, index, value) => {
-                //     // update the point left and right of clicked point
-                //     // if the first point is clicked, only update the point to the right
-                //     if (index === 0) {
-                //         LineChartHelper.Chart.data.datasets[datasetIndex].data[index + 1] = value
-                //         // if the last point is clicked, only update the point before
-                //     } else if (index === (LineChartHelper.Chart.data.datasets[datasetIndex].data.length - 1)) {
-                //         LineChartHelper.Chart.data.datasets[datasetIndex].data[index - 1] = value
-                //     } else {
-                //         // all other cases
-                //         LineChartHelper.Chart.data.datasets[datasetIndex].data[index - 1] = value
-                //         LineChartHelper.Chart.data.datasets[datasetIndex].data[index + 1] = value
-                //     }
-                //     LineChartHelper.Chart.update()
-                // },
+                onDragStart: (e, datasetIndex, index, value) => {
+                    startingValue = LineChartHelper.Chart.data.datasets[datasetIndex].data[index]
+                },
+                onDragEnd: (e, datasetIndex, index, value) => {
+                    const spread = parseInt(document.getElementById('spread').value) ?? 100;
+                    const intensity = parseFloat(document.getElementById('intensity').value) ?? 0.8;
+                    new Spread(spread, intensity).apply(LineChartHelper.Chart, datasetIndex, index, value, startingValue)
+
+                }
             }
         }
     }
@@ -118,11 +137,16 @@ export default class LineChartHelper {
      */
     static addDataPoint(chart, label, pos, data) {
 
+        const spread = parseInt(document.getElementById('spread').value) ?? 100;
+        const intensity = parseFloat(document.getElementById('intensity').value) ?? 0.8;
+
         chart.data.labels.splice(pos, 1, label)
 
-        for (let chartId = 0; chartId < chart.data.datasets.length; chartId++)
+        for (let chartId = 0; chartId < chart.data.datasets.length; chartId++) {
 
             if (pos < chart.data.datasets[chartId].data.length) {
+                new Spread(spread, intensity).apply(chart, chartId, pos, data, chart.data.datasets[chartId].data[pos] ?? 0)
+
                 chart.data.datasets[chartId].data[pos] = parseInt(data);
             }
             else {
@@ -133,18 +157,21 @@ export default class LineChartHelper {
                 chart.data.datasets[chartId].data.push(parseInt(data))
             }
 
-        if (pos < chart.data.labels.length) {
-            chart.data.labels[pos] = pos;
-        }
-        else {
+            if (pos < chart.data.labels.length) {
+                chart.data.labels[pos] = pos;
+            }
+            else {
 
-            chart.data.labels[chart.data.labels.length - 1] = chart.data.labels.length
-            for (let i = chart.data.labels.length + 1; i < pos; i++) {
-                chart.data.labels.push(i)
+                chart.data.labels[chart.data.labels.length - 1] = chart.data.labels.length
+                for (let i = chart.data.labels.length + 1; i < pos; i++) {
+                    chart.data.labels.push(i)
+                }
+
+                chart.data.labels.push(parseInt(pos))
             }
 
-            chart.data.labels.push(parseInt(pos))
         }
+
 
         chart.update();
     }
