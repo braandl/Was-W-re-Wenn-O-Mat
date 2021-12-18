@@ -1,15 +1,38 @@
 <html>
-    <head>
-        <title>Was-Wäre-Wenn-O-Mat</title>
-    </head>
-    <body>
-        <canvas style="width: 75%" id="chart"></canvas>
 
-        Tag <input id="tag" value="100"/><button id="calc">Berechnen</button>
+<head>
+    <title>Was-Wäre-Wenn-O-Mat</title>
+</head>
 
-        <div>Wahrscheinlichkeit ungeimpft: <span id="total"></span></div>
+<body>
+    <canvas style="width: 75%" id="chart"></canvas>
 
-        <div>Wahrscheinlichkeit geimpft: <span id="vax"></span></div>
-        <script src="main.js"></script>
-    </body>
+    <div>
+        <div>
+            Info: Der Graph kann gezoomt und verschoben werden.
+        </div>
+        <div>
+            Max Spread <input id="spread" type="number" min="1" max="500" value="250" />
+            Max Intensity <input id="intensity" type="number" value="0.8" min="0.1" max="1.0"/>
+        </div>
+    </div>
+
+    <div>
+        <div>
+            Wert für einen Tag hinzufügen
+        </div>
+        <div>
+            Wert <input id="inz" value="100" /> <input id="inz_day" value="100" /><button
+                id="inz_add">Hinzufügen</button>
+        </div>
+    </div>
+
+    <div>
+        Tag <input id="tag" value="100" /><button id="calc">Berechnen</button>
+
+        <div>Wahrscheinlichkeit ungeimpft: <span id="total"></span>%</div>
+    </div>
+    <script src="main.js"></script>
+</body>
+
 </html>
